@@ -2,6 +2,9 @@ import maya
 import re
 import copy
 import json
+import tarfile
+import os
+import zipfile
 
 
 def test_for_data(_):
@@ -41,7 +44,40 @@ def test_for_data(_):
     return data
 
 
+def generate_tar_file(tar_path):
+    if os.path.exists(tar_path):
+        os.remove(tar_path)
+
+    with tarfile.open(r"NiceLib.tar", "a") as t:
+        t.add("NiceLib")
+
+    with tarfile.open(r"NiceLib.tar", "r") as t:
+        for m in t.getnames():
+            print(m)
+
+
+def make_dirs_to_zip(source_dir, zip_name):
+    """将文件打包成zip压缩包"""
+    print("******************zip start******************")
+    with zipfile.ZipFile(zip_name, "w") as z:
+        # 出去要压缩的文件的路径长度(最右边不带斜杠)
+        base_path_len = len(os.path.dirname(source_dir))
+        for parent, dir_names, file_names in os.walk(source_dir):
+            for file_name in file_names:
+                file_path = os.path.join(parent, file_name)
+                # 在zip包中的归档路径（用相对路径表示）
+                archive_name = file_path[base_path_len:].strip(os.path.sep)
+                z.write(file_path, archive_name)
+    print("******************zip end******************")
+
+
 if __name__ == "__main__":
-    org_name = None
-    if org_name and ((len(org_name) > 50 and org_name[-2:] != u"公司") or (org_name.find(u"&times;") > -1)):
-        return data
+    # base_path = r"D:\PrivateProject\Python-Tags"
+    # source_dir_cur = os.path.join(base_path, r"NiceLib")
+    # # 最好用绝对路径，且生成zip的路径不能包含在要压缩的文件夹内部，否则会一直递归压缩，生成的zip包会越来越大
+    # # 如果运行生成zip的程序在需要压缩的文件夹内，则如果不用绝对路径设置压缩路径在要压缩的文件夹外部，则会产生递归压缩
+    # zip_name_cur = os.path.join(base_path, "NiceLib.zip")
+    # make_dirs_to_zip(source_dir_cur, zip_name_cur)
+
+    path = r"/home/scrapyer/workspace/luhu/"
+    print(os.path.split(path))
