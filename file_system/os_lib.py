@@ -1,4 +1,6 @@
 import os
+import datetime
+import time
 
 
 def os_path_sep():
@@ -40,8 +42,8 @@ def os_path_basename_and_dirname():
         print("{!r:>17}: {}".format(path, os.path.dirname(path)))
 
 
-# splittext(): 通过扩展名分隔符进行分隔
 def os_path_splitext():
+    """通过扩展名分隔符进行分隔"""
     paths = [
         "/one/two/three.txt",
         "/one/two.py",
@@ -81,7 +83,7 @@ def os_path_commonpath():
 def os_path_join():
     """拼接路径"""
     paths = [
-        ("one", "two", "three"),    # one\two\three
+        ("one", "two", "three"),  # one\two\three
         ("\\", "one", "\\two", "three"),  # \one\two\three
         ("/", "/one", "two", "three"),  # /one\two\three
         ("/one", "/two", "/three"),  # /three
@@ -155,6 +157,52 @@ def os_path_abspath():
         print("{!r:>21}: {!r}".format(path, os.path.abspath(path)))
 
 
+def os_path_properties():
+    """获取文件属性"""
+    print("File: ", __file__)
+    # 访问时间, 时间戳转英文日期，用time.ctime, 时间戳转数字日期，用datetime.datetime.fromtimestamp
+    print("access time: ", time.ctime(os.path.getatime(__file__)),
+          datetime.datetime.fromtimestamp(os.path.getatime(__file__)))
+    print("modified time: ", datetime.datetime.fromtimestamp(os.path.getmtime(__file__)))
+    # 创建时间
+    print("create time: ", datetime.datetime.fromtimestamp(os.path.getctime(__file__)))
+    print("size: ", datetime.datetime.fromtimestamp(os.path.getsize(__file__)))
+
+
+def os_path_file():
+    """输出__file__(当前文件)的路径"""
+    # 绝对路径： E:/SocialProject/Learn-Tags/PythonStandardLibrary/file_system/os_lib.py
+    print(__file__)
+    # 不包含文件名称的路径： E:/SocialProject/Learn-Tags/PythonStandardLibrary/file_system
+    print(os.path.dirname(__file__))
+    # 文件名称： os_lib.py
+    print(os.path.basename(__file__))
+
+
+def os_path_tests():
+    """测试文件是否存在"""
+    paths = [
+        __file__,
+        os.path.dirname(__file__),
+        "D:",
+        r"E:\MySQL.lnk",
+        r"E:\SQL必知必会（第4版）.pdf.lnk"
+    ]
+
+    # windows系统中快捷方式都有一个lnk后缀被隐藏显示了
+    for path in paths:
+        path = os.path.normpath(path)
+        print("FIle     :", path)
+        print("is abs?  :", os.path.isabs(path))
+        print("is File? :", os.path.isfile(path))
+        print("is dir?  :", os.path.isdir(path))
+        print("is link? :", os.path.islink(path))
+        print("is MountPoint?:", os.path.ismount(path))
+        print("exists?  :", os.path.exists(path))
+        print("is link exists :", os.path.lexists(path))
+        print()
+
+
 if __name__ == "__main__":
     os_path_split()
 
@@ -184,3 +232,9 @@ if __name__ == "__main__":
 
     print("\nos_path_abspath:")
     os_path_abspath()
+
+    print("\nos_path_properties: ")
+    os_path_properties()
+
+    print("\nos_path_tests: ")
+    os_path_tests()
