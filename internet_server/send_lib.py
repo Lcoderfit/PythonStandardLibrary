@@ -99,6 +99,8 @@ if __name__ == '__main__':
     # 将目标文件进行压缩
     base_path = r"D:\PrivateProject\Python-Tags"
     source_dir_cur = os.path.join(base_path, r"NiceLib")
+    # base_path = r"E:\SocialProject"
+    # source_dir_cur = os.path.join(base_path, r"Video-Tags")
     # 最好用绝对路径，且生成zip的路径不能包含在要压缩的文件夹内部，否则会一直递归压缩，生成的zip包会越来越大
     # 如果运行生成zip的程序在需要压缩的文件夹内，则如果不用绝对路径设置压缩路径在要压缩的文件夹外部，则会产生递归压缩
     zip_file_name = r"NiceLib.zip"
