@@ -52,6 +52,17 @@ def pathlib_existing():
     print(path)
 
 
+def pathlib_parts():
+    """将路径根据路径分隔符分隔，得到一个元组"""
+    path = pathlib.WindowsPath(r"D:\lcoderfit\fuck")
+    part_list = path.parts
+    print(part_list)
+
+    """
+    ('D:\\', 'lcoderfit', 'fuck')
+    """
+
+
 def pathlib_parent():
     """不断向上迭代获取父目录"""
     path = pathlib.WindowsPath(r"D:\one\two\three.py")
@@ -109,6 +120,84 @@ def pathlib_convenience():
     print("home: ", home)
     print("cwd: ", cwd)
 
+    r"""
+    home:  C:\Users\Lcoderfit
+    cwd:  E:\SocialProject\Learn-Tags\PythonStandardLibrary\file_system
+    """
+
+
+def pathlib_iterdir():
+    """访问目录列表, 如果Path不指示一个目录，会产生NotADirectoryError
+    如果指示的目录不存在，会抛出一个FileNotFoundError
+    """
+    p = pathlib.Path(".")
+    for f in p.iterdir():
+        print(f)
+
+    r"""
+    os_lib.py
+    pathlib_lib.py
+    """
+
+
+def pathlib_global():
+    """通过匹配模式找到对应的文件"""
+    p = pathlib.Path(".")
+    for f in p.glob("*.py"):
+        print(f)
+
+    r"""
+os_lib.py
+pathlib_lib.py
+    """
+
+
+def pathlib_rglobal():
+    """支持递归扫描"""
+    p = pathlib.Path(".")
+    for f in p.rglob("*.py"):
+        print(f)
+
+    """
+os_lib.py
+pathlib_lib.py
+test_for_rglobal\test_for_rglobal.py
+    """
+
+
+def path_read_write():
+    """读写文件"""
+    f = pathlib.Path("os_lib.py")
+    f.write_bytes("This is function path_read_write".encode("utf-8"))
+    with f.open('r', encoding="utf-8") as handle:
+        print("read from open(): {!r}".format(handle.read()))
+
+    print("read_text(): {!r}".format(f.read_text("utf-8")))
+    print(f.read_bytes())
+    print(f.read_bytes().decode("utf-8"))
+
+    """
+read from open(): 'This is function path_read_write'
+read_text(): 'This is function path_read_write'
+b'This is function path_read_write'
+This is function path_read_write
+    """
+
+
+def pathlib_mkdir():
+    """创建文件, 如果文件已存在，则会产生一个FileExistsError"""
+    # p = pathlib.Path("a")
+    # print("Creating {}".format(p))
+    # p.mkdir()
+
+
+def pathlib_symlink_to():
+    """创建符号链接"""
+    p = pathlib.Path("first_link")
+    p.symlink_to("test_for_rglobal/test_for_rglobal.py")
+    print(p)
+    print(p.resolve().name)
+
 
 if __name__ == "__main__":
     # pathlib: 用来进行路径处理的库，可以替代os.path
@@ -125,6 +214,9 @@ if __name__ == "__main__":
     print("\npathlib_existing: ")
     pathlib_existing()
 
+    print("\npathlib_parts")
+    pathlib_parts()
+
     print("\npathlib_parent: ")
     pathlib_parent()
 
@@ -133,3 +225,26 @@ if __name__ == "__main__":
 
     print("\npathlib_convenience: ")
     pathlib_convenience()
+
+    # 访问文件系统中存在的目录
+    print("\npathlib_iterdir: ")
+    pathlib_iterdir()
+
+    print("\npathlib_global: ")
+    pathlib_global()
+
+    print("\npathlib_rglobal: ")
+    pathlib_rglobal()
+
+    # 读写文件
+    print("\npath_read_write: ")
+    path_read_write()
+
+    # 创建目录和符号链接
+    print("\npathlib_mkdir: ")
+    pathlib_mkdir()
+
+    print("\npathlib_symlink_to: ")
+    pathlib_symlink_to()
+
+

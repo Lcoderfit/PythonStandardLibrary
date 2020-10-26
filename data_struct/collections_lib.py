@@ -93,7 +93,7 @@ def count_chars():
     # 返回Counter中的所有元素, elements()返回的是一个迭代器
     print("elements: ", [e for e in c.elements()])
     # 获取不存在的字符，不会报错，会返回一个0值
-    print(c["k"])
+    print(c["test_for_rglobal"])
 
 
 def collections_counter_most_common():
