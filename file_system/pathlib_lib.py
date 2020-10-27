@@ -1,4 +1,10 @@
+import datetime
+import itertools
+import os
 import pathlib
+import time
+import stat
+import sys
 
 
 def pathlib_operate():
@@ -110,6 +116,171 @@ def pathlib_convenience():
     print("cwd: ", cwd)
 
 
+def pathlib_types():
+    """检测文件类型"""
+    root = pathlib.Path("test_file")
+    if root.exists():
+        for f in root.iterdir():
+            # 如果test_file是个文件或者链接，则会删除，如果是个目录，则会调用rmdir()删除该目录
+            f.unlink()
+    else:
+        root.mkdir()
+
+    (root / 'file').write_text("this is a regular file", encoding='utf-8')
+    # ??????????    OSError: symbolic link privilege not held
+    (root / 'symlink').symlink_to('file')
+    os.mkfifo(str(root / 'fifo'))
+
+    to_scan = itertools.chain(
+        root.iterdir(),
+        [
+            pathlib.Path('/dev/disk0'),
+            pathlib.Path('/dev/console'),
+        ]
+    )
+    hfmt = '{:18s}' + ('  {:>5} * 6')
+    print(hfmt.format("Name", "File", "Dir", "Link", "FIFO", "Block", "Character"))
+    print()
+    # !r表示对参数调用repr函数的返回值
+    fmt = '{:20s}' + ('{!r:>5} * 6')
+
+    for f in to_scan:
+        print(fmt.format(
+            str(f),
+            f.is_file(),
+            f.is_dir(),
+            f.is_symlink(),
+            f.is_fifo(),
+            f.is_block_device(),
+            f.is_char_device(),
+        ))
+
+
+def pathlib_stat():
+    """返回文件或链接的属性"""
+    # lstat用来检查一个可能是符号链接的目标状态
+    if len(sys.argv) == 1:
+        filename = __file__
+    else:
+        filename = sys.argv[1]
+    p = pathlib.Path(filename)
+    stat_info = p.stat()
+    print('{}'.format(filename))
+    print('Size:', stat_info.st_size)
+    print('Permissions:', oct(stat_info.st_mode))
+    print('Owner:', stat_info.st_uid)
+    print('Device: ', stat_info.st_dev)
+    # 创建时间
+    print("created: ", time.ctime(stat_info.st_ctime), datetime.datetime.fromtimestamp(stat_info.st_ctime))
+    # 修改时间
+    print("last modified: ", time.ctime(stat_info.st_mtime), datetime.datetime.fromtimestamp(stat_info.st_mtime))
+    # 访问时间
+    print("last accessed: ", time.ctime(stat_info.st_atime), datetime.datetime.fromtimestamp(stat_info.st_atime))
+
+    """
+    D:/PrivateProject/Python-Tags/PythonStandardLibrary/file_system/pathlib_lib.py
+    Size: 5518
+    Permissions: 0o100666
+    Owner: 0
+    Device:  1692097895
+    created:  Mon Oct 26 09:46:14 2020 2020-10-26 09:46:14.449000
+    last modified:  Mon Oct 26 11:11:35 2020 2020-10-26 11:11:35.660000
+    last accessed:  Mon Oct 26 11:11:35 2020 2020-10-26 11:11:35.660000
+    """
+
+
+def pathlib_ownership():
+    """访问文件所有者信息"""
+    p = pathlib.Path(__file__)
+    print('{} is owned by {}/{}', p, p.owner(), p.group())
+
+
+def pathlib_touch():
+    """创建一个文件，或者更新一个现有文件的修改时间和权限"""
+    p = pathlib.Path('touched')
+    if p.exists():
+        print("already exists")
+    else:
+        print("creating new")
+    p.touch()
+    start = p.stat()
+
+    time.sleep(1)
+    p.touch()
+    end = p.stat()
+
+    print("Start: ", time.ctime(start.st_mtime), datetime.datetime.fromtimestamp(start.st_mtime))
+    print("End: ", time.ctime(end.st_mtime), datetime.datetime.fromtimestamp(end.st_mtime))
+
+    """
+already exists
+Start:  Mon Oct 26 11:43:13 2020 2020-10-26 11:43:13.565000
+End:  Mon Oct 26 11:43:14 2020 2020-10-26 11:43:14.565000
+    """
+
+
+def pathlib_chmod():
+    """修改文件的权限"""
+    f = pathlib.Path("test_for_chmod.txt")
+    if f.exists():
+        f.unlink()
+    f.touch()
+    f.write_bytes("contents".encode("utf-8"))
+    # 返回文件的权限
+    existing_permissions = stat.S_IMODE(f.stat().st_mode)
+    # 以8进制的方式输出
+    print("Before: {:o}".format(existing_permissions))
+
+    # 无法修改文件权限
+    if not (existing_permissions & os.X_OK):
+        print("Adding excute permission")
+        # S_IXUSR: 所有者拥有执行权限
+        new_permissions = existing_permissions | stat.S_IXUSR
+    else:
+        print("Removeing execute permission")
+        new_permissions = existing_permissions ^ stat.S_IXUSR
+
+    f.chmod(444)
+    after_permissions = stat.S_IMODE(f.stat().st_mode)
+    print(new_permissions)
+    print(after_permissions)
+    print("{:o}".format(after_permissions))
+
+    """
+Before: 666
+Adding excute permission
+666
+    """
+
+
+def pathlib_rmdir():
+    """删除一个空目录，如果目录不是空的，则会弹出OSError错误, 如果删除一个不存在的目录,则会产生FileNotFoundError"""
+    p = pathlib.Path("test_for_rm")
+    if not p.exists():
+        p.mkdir()
+    p.rmdir()
+    print("Removing {}".format(p))
+    """
+Removing test_for_rm
+    """
+
+
+def pathlib_unlink():
+    """使用unlink，如果是个文件或者链接，则会删除，如果是个目录，则会调用rmdir()删除该目录"""
+    p = pathlib.Path("touched")
+    p.touch()
+    print("exists before removing: ", p.exists())
+
+    # 如果文件不存在，则会报：FileNotFoundError
+    # 用户必须具有文件、链接、套接字等文件系统对象的删除权限
+    p.unlink()
+    print("exists after removing: ", p.exists())
+    """
+exists before removing:  True
+exists after removing:  False
+    """
+
+
 if __name__ == "__main__":
     # pathlib: 用来进行路径处理的库，可以替代os.path
 
@@ -133,3 +304,28 @@ if __name__ == "__main__":
 
     print("\npathlib_convenience: ")
     pathlib_convenience()
+
+    # 检测文件类型
+    print("\npathlib_types: ")
+    # pathlib_types()
+
+    # 文件属性
+    print("\npathlib_stat: ")
+    pathlib_stat()
+
+    print("\npathlib_ownership: ")
+    # pathlib_ownership()
+
+    print("\npathlib_touch: ")
+    pathlib_touch()
+
+    # 权限?????
+    print("\npathlib_chmod: ")
+    pathlib_chmod()
+
+    # 删除
+    print("\npathlib_rmdir: ")
+    pathlib_rmdir()
+
+    print("\npathlib_unlink: ")
+    pathlib_unlink()

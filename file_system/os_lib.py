@@ -203,38 +203,60 @@ def os_path_tests():
         print()
 
 
+def extra_recursion_remove_path(dir_path="test_for_recursion"):
+    """递归删除目录及其子文件或目录"""
+    # if os.path.exists(dir_path):
+    #     for file_name in os.listdir(dir_path):
+    #         os.remove(os.path.join(dir_path, file_name))
+    #     os.rmdir(dir_path)
+    # os.mkdir(dir_path)
+
+    if not os.path.exists(dir_path):
+        return
+    for file_name in os.listdir(dir_path):
+        operate_file = os.path.join(dir_path, file_name)
+        if os.path.isdir(operate_file):
+            extra_recursion_remove_path(operate_file)
+        else:
+            os.remove(operate_file)
+    os.rmdir(dir_path)
+
+
 if __name__ == "__main__":
-    os_path_split()
+    # os_path_split()
+    #
+    # print()
+    # os_path_basename_and_dirname()
+    #
+    # print("\nos_path_splitext:")
+    # os_path_splitext()
+    #
+    # print("\nos_path_commonprefix:")
+    # os_path_commonprefix()
+    #
+    # print("\nos_path_commonpath:")
+    # os_path_commonpath()
+    #
+    # print("\nos_path_join：")
+    # os_path_join()
+    #
+    # print("\nos_path_expanduser:")
+    # os_path_expanduser()
+    #
+    # print("\nos_path_expandvars:")
+    # os_path_expandvars()
+    #
+    # print("\nos_path_normpath:")
+    # os_path_normpath()
+    #
+    # print("\nos_path_abspath:")
+    # os_path_abspath()
+    #
+    # print("\nos_path_properties: ")
+    # os_path_properties()
+    #
+    # print("\nos_path_tests: ")
+    # os_path_tests()
 
-    print()
-    os_path_basename_and_dirname()
-
-    print("\nos_path_splitext:")
-    os_path_splitext()
-
-    print("\nos_path_commonprefix:")
-    os_path_commonprefix()
-
-    print("\nos_path_commonpath:")
-    os_path_commonpath()
-
-    print("\nos_path_join：")
-    os_path_join()
-
-    print("\nos_path_expanduser:")
-    os_path_expanduser()
-
-    print("\nos_path_expandvars:")
-    os_path_expandvars()
-
-    print("\nos_path_normpath:")
-    os_path_normpath()
-
-    print("\nos_path_abspath:")
-    os_path_abspath()
-
-    print("\nos_path_properties: ")
-    os_path_properties()
-
-    print("\nos_path_tests: ")
-    os_path_tests()
+    print("\nextra_recursion_remove_path: ")
+    extra_recursion_remove_path("dir")
