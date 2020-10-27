@@ -362,6 +362,7 @@ def pathlib_unlink():
 
     # 如果文件不存在，则会报：FileNotFoundError
     # 用户必须具有文件、链接、套接字等文件系统对象的删除权限
+    # unlink好像无法删除目录，但可以删除文件跟链接
     p.unlink()
     print("exists after removing: ", p.exists())
     """
