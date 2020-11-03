@@ -122,6 +122,59 @@ True <tempfile._TemporaryFileWrapper object at 0x00000000021B3608>
     """
 
 
+def tempfile_TemporaryDirectory():
+    """需要生成多个临时文件，可以先生成一个目录，然后在该目录中打开多个文件"""
+    with tempfile.TemporaryDirectory() as directory_name:
+        the_dir = pathlib.Path(directory_name)
+        print(the_dir)
+        a_file = the_dir / "a_file.txt"
+        a_file.write_text("This file is deleted")
+    print("Directory is exists after?: ", the_dir.exists())
+    print("Contents after: ", list(the_dir.glob("*")))
+    r"""
+C:\Users\VIRUSE~1.V-D\AppData\Local\Temp\tmp4xrapo9n
+Directory is exists after?:  False
+Contents after:  []
+    """
+
+
+def tempfile_NamedTemporaryFile_args():
+    """为临时文件添加可预测的部分"""
+    # dir参数必须是存在在系统中的路径，否则会报错
+    with tempfile.NamedTemporaryFile(suffix='_suffix', prefix='prefix_', dir=r".") as temp:
+        print("temp: ")
+        print(" ", temp)
+        print('temp.name: ')
+        print(" ", temp.name)
+    r"""
+tempfile_NamedTemporaryFile_args: 
+temp: 
+  <tempfile._TemporaryFileWrapper object at 0x0000000001E85948>
+temp.name: 
+  D:\PrivateProject\Python-Tags\PythonStandardLibrary\file_system\prefix_rbxo9zi5_suffix
+    """
+
+
+def tempfile_settings():
+    """临时文件默认设置: 包含临时文件的目录和创建的临时文件的前缀"""
+    print("gettempdir(): ", tempfile.gettempdir())
+    print("gettempprofix(): ", tempfile.gettempprefix())
+    r"""
+gettempdir():  C:\Users\VIRUSE~1.V-D\AppData\Local\Temp
+gettempprofix():  tmp
+    """
+
+
+def tempfile_tempdir():
+    """设置临时文件存放的位置"""
+    tempfile.tempdir = "."
+    print(tempfile.gettempdir())
+    """
+tempfile_tempdir: 
+.
+    """
+
+
 if __name__ == '__main__':
     # 用于安全的创建临时文件系统资源
     # 可以用于临时创建文件，写入内容然后读取（无需保存文件），或者直接用于联系文件操作，省得创建的文件又要删除
@@ -142,3 +195,15 @@ if __name__ == '__main__':
 
     print("\ntempfile_SpooleTemporaryFile_explicit: ")
     tempfile_SpooleTemporaryFile_explicit()
+
+    print("\ntempfile_TemporaryDirectory: ")
+    tempfile_TemporaryDirectory()
+
+    print("\ntempfile_NamedTemporaryFile_args: ")
+    tempfile_NamedTemporaryFile_args()
+
+    print("\ntempfile_settings: ")
+    tempfile_settings()
+
+    print("\ntempfile_tempdir: ")
+    tempfile_tempdir()
